@@ -1,0 +1,19 @@
+{
+  "name": "react-siesta",
+  "version": "0.0.1",
+  "description": "React mixins & support for Siesta",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mtford90/react-siesta"
+  },
+  "author": "Michael Ford",
+  "license": "Apache v2.0",
+  "bugs": {
+    "url": "https://github.com/mtford90/react-siesta/issues"
+  },
+  "homepage": "https://github.com/mtford90/react-siesta"
+}

@@ -1,0 +1,19 @@
+{
+  "name": "react-siesta",
+  "main": "index.js",
+  "version": "0.0.1",
+  "homepage": "https://github.com/mtford90/react-siesta",
+  "authors": [
+    "Michael Ford <mtford@gmail.com>"
+  ],
+  "description": "React mixins & support for Siesta",
+  "license": "Apache v2.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "vendor",
+    "test",
+    "tests"
+  ]
+}
