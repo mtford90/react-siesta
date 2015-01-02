@@ -1,7 +1,7 @@
-
 var SiestaMixin = {
     componentWillMount: function () {
         this.rqListeners = [];
+        this.otherListeners = [];
     },
     _removeRQListeners: function () {
         for (var i = 0; i < this.rqListeners.length; i++) {
@@ -12,8 +12,19 @@ var SiestaMixin = {
         }
         this.rqListeners = [];
     },
+    _removeOtherListeners: function () {
+        for (var i = 0; i < this.otherListeners.length; i++) {
+            var cancelListener = this.otherListeners[i];
+            cancelListener();
+        }
+        this.otherListeners = [];
+    },
     componentWillUnmount: function () {
         this._removeRQListeners();
+        this._removeOtherListeners();
+    },
+    listen: function (o, fn) {
+        this.otherListeners.push(o.listen(fn));
     },
     /**
      * Register a listener to a reactive query. Listeners are automatically removed when the component is unmounted
