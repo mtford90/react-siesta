@@ -26,6 +26,13 @@ var SiestaMixin = {
     listen: function (o, fn) {
         this.otherListeners.push(o.listen(fn));
     },
+    listenToSingleton: function (Singleton, fn) {
+        var getPromise = Singleton.get();
+        getPromise.then(function (singleton) {
+            this.listen(singleton, function (n) {fn(singleton, n)});
+        }.bind(this));
+        return getPromise;
+    },
     /**
      * Register a listener to a reactive query. Listeners are automatically removed when the component is unmounted
      * @param {ReactiveQuery} rq
