@@ -11,9 +11,14 @@
     "url": "https://github.com/mtford90/react-siesta"
   },
   "author": "Michael Ford",
-  "license": "Apache v2.0",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/mtford90/react-siesta/issues"
   },
-  "homepage": "https://github.com/mtford90/react-siesta"
+  "homepage": "https://github.com/mtford90/react-siesta",
+  "keywords": [
+    "react",
+    "reactjs",
+    "siesta"
+  ]
 }

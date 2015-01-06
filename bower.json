@@ -7,7 +7,7 @@
     "Michael Ford <mtford@gmail.com>"
   ],
   "description": "React mixins & support for Siesta",
-  "license": "Apache v2.0",
+  "license": "MIT",
   "ignore": [
     "**/.*",
     "node_modules",
@@ -15,5 +15,10 @@
     "vendor",
     "test",
     "tests"
+  ],
+  "keywords": [
+    "react",
+    "reactjs",
+    "siesta"
   ]
 }
