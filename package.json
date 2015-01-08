@@ -20,5 +20,16 @@
     "react",
     "reactjs",
     "siesta"
-  ]
+  ],
+  "devDependencies": {
+    "chai": "^1.10.0",
+    "es5-shim": "^4.0.5",
+    "jquery": "^2.1.3",
+    "mocha": "^2.1.0",
+    "pouchdb": "^3.2.1",
+    "q": "^1.1.2",
+    "siesta": "^0.2.9",
+    "siesta-orm": "^0.1.0",
+    "underscore": "^1.7.0"
+  }
 }
