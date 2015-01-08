@@ -4,7 +4,7 @@
   "description": "React mixins & support for Siesta",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "open mocha.html",
     "compile": "./node_modules/uglify-js/bin/uglifyjs index.js > dist/react-siesta.min.js"
   },
   "repository": {
