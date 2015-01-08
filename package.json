@@ -1,10 +1,11 @@
 {
   "name": "react-siesta",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "React mixins & support for Siesta",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "./node_modules/uglify-js/bin/uglifyjs index.js > dist/react-siesta.min.js"
   },
   "repository": {
     "type": "git",
@@ -30,6 +31,8 @@
     "q": "^1.1.2",
     "siesta": "^0.2.9",
     "siesta-orm": "^0.1.0",
+    "uglify-js": "^2.4.16",
+    "uglifyjs": "^2.3.6",
     "underscore": "^1.7.0"
   }
 }
