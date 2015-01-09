@@ -31,6 +31,5 @@ var SiestaMixin = {
     }
 };
 
-module.exports = {
-    SiestaMixin: SiestaMixin
-};
+if (typeof module !== 'undefined') module.exports = {SiestaMixin: SiestaMixin};
+if (typeof window !== 'undefined') window.SiestaMixin = SiestaMixin;
