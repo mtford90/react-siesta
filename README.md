@@ -1,15 +1,6 @@
 react-siesta
 ============
 
-React mixins &amp; support for Siesta
+Useful components & mixins for using Siesta with ReactJS.
 
-# Siesta Mixin
-
-## Usage
-
-```js
-var MyComponent = React.createClass({
-    mixins: [SiestaMixin]
-    /* ... */
-});
-```
+See the [documentation](http://mtford.co.uk/siesta/docs.html#reactjs-mixin) for usage.
