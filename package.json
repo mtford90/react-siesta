@@ -51,8 +51,5 @@
     "uglify-js": "^2.4.16",
     "uglifyjs": "^2.3.6",
     "underscore": "^1.7.0"
-  },
-  "dependencies": {
-    "connect": "^3.3.4"
   }
 }
