@@ -87,6 +87,44 @@ var SiestaMixin = {
             cb = arguments[3];
         }
         return this.query(model, query, prop, cb);
+    },
+    isReactiveQuery: function (o) {
+        // TODO: Wishy washy. Do instanceof check instead once ReactiveQuery is available on siesta object
+        return typeof o.terminate == 'function';
+    },
+    listenAndSet: function (o, prop, cb) {
+        var deferred = window.Q ? window.Q.defer() : FAKE_DEFERRED;
+        cb = cb || function () {};
+        var state = {};
+
+        function updateWithResults() {
+            state[prop] = o.results;
+            this.setState(state, function () {
+                this.listen(o, function () {
+                    if (this.isReactiveQuery(o)) {
+                        var state = {};
+                        state[prop] = o.results;
+                        this.setState(state);
+                    }
+                }.bind(this));
+            });
+        }
+
+        if (this.isReactiveQuery(o)) {
+            if (o.initialised) {
+                updateWithResults.call(this);
+                cb(null, o.results);
+                deferred.resolve(o.results);
+            }
+            else {
+                o.init(function () {
+                    updateWithResults.call(this);
+                    cb(null, o.results);
+                    deferred.resolve(o.results);
+                }.bind(this));
+            }
+        }
+        return deferred.promise;
     }
 };
 
