@@ -1,3 +1,6 @@
+// Just makes the code a tad cleaner if no window.Q available.
+var FAKE_DEFERRED = {promise: null, reject: function () {}, resolve: function () {}};
+
 var SiestaMixin = {
     componentWillMount: function () {
         this.listeners = [];
@@ -15,7 +18,7 @@ var SiestaMixin = {
     _listenToModel: function (func, Model, fn) {
         var cancelListen;
         if (Model.singleton) {
-            Model.one().execute(function (err, singleton) {
+            Model.one(function (err, singleton) {
                 if (!err) {
                     cancelListen = this[func](singleton, function (n) {fn(singleton, n)});
                     this.listeners.push(cancelListen);
@@ -51,6 +54,26 @@ var SiestaMixin = {
         else cancelListen = o.listen(fn);
         if (cancelListen) this.listeners.push(cancelListen);
         return this.wrapCancelListen(cancelListen);
+    },
+    query: function (model, query, prop, cb) {
+        var deferred = window.Q ? window.Q.defer() : FAKE_DEFERRED;
+        cb = cb || function () {};
+        model.query(query, function (err, res) {
+            console.log('done');
+            if (!err) {
+                var state = {};
+                state[prop] = res;
+                this.setState(state, function () {
+                    cb(null, res);
+                    deferred.resolve(res);
+                });
+            }
+            else {
+                cb(err);
+                deferred.reject(err);
+            }
+        }.bind(this));
+        return deferred.promise;
     }
 };
 
