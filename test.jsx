@@ -227,7 +227,6 @@ describe('listen', function () {
 
         });
         it('reactive query, not initialised', function (done) {
-
             Collection = siesta.collection('Collection');
             Model = Collection.model('Model', {
                 attributes: ['x']
@@ -259,7 +258,69 @@ describe('listen', function () {
                 }).catch(done);
 
         });
-    })
+        it('arranged reactive query, initialised', function (done) {
+            Collection = siesta.collection('Collection');
+            Model = Collection.model('Model', {
+                attributes: ['x', 'index']
+            });
+            Model.map([{x: 2}, {x: 3}])
+                .then(function (instances) {
+                    var rq = Model.arrangedReactiveQuery();
+                    rq.init().then(function () {
+                        var Component = React.createClass({
+                            mixins: [SiestaMixin],
+                            render: function () {
+                                return (<span></span>);
+                            },
+                            componentDidMount: function () {
+                                this.listenAndSet(rq, 'models');
+                                assert.equal(this.state.models.length, 2);
+                                assert.include(this.state.models, instances[0]);
+                                assert.include(this.state.models, instances[1]);
+                                done();
+                            }
+                        });
+                        React.render(
+                            <Component />,
+                            document.getElementById('react')
+                        );
+                    });
+                }).catch(done);
+
+        });
+        it('arranged reactive query, not initialised', function (done) {
+            Collection = siesta.collection('Collection');
+            Model = Collection.model('Model', {
+                attributes: ['x', 'index']
+            });
+            Model.map([{x: 2}, {x: 3}])
+                .then(function (instances) {
+                    console.log('instances', instances);
+                    var rq = Model.arrangedReactiveQuery();
+                    var Component = React.createClass({
+                        mixins: [SiestaMixin],
+                        render: function () {
+                            return (<span></span>);
+                        },
+                        componentDidMount: function () {
+                            this.listenAndSet(rq, 'models')
+                                .then(function () {
+                                    console.log('state', this.state);
+                                    assert.equal(this.state.models.length, 2);
+                                    assert.include(this.state.models, instances[0]);
+                                    assert.include(this.state.models, instances[1]);
+                                    done();
+                                }.bind(this)).catch(done)
+                        }
+                    });
+                    React.render(
+                        <Component />,
+                        document.getElementById('react')
+                    );
+                }).catch(done);
+
+        });
+    });
 
 
 });
