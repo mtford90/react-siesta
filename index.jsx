@@ -74,6 +74,19 @@ var SiestaMixin = {
             }
         }.bind(this));
         return deferred.promise;
+    },
+    all: function (model) {
+        var query, prop, cb;
+        if (arguments[1] instanceof String || typeof arguments[1] == 'string') {
+            prop = arguments[1];
+            cb = arguments[2];
+        }
+        else {
+            query = arguments[1];
+            prop = arguments[2];
+            cb = arguments[3];
+        }
+        return this.query(model, query, prop, cb);
     }
 };
 
