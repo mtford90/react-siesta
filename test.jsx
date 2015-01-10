@@ -292,7 +292,6 @@ describe('listen', function () {
                 }).catch(done);
 
         });
-
         it('arranged reactive query, initialised', function (done) {
             Collection = siesta.collection('Collection');
             Model = Collection.model('Model', {
