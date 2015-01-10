@@ -258,6 +258,41 @@ describe('listen', function () {
                 }).catch(done);
 
         });
+        it('reactive query, update', function (done) {
+            Collection = siesta.collection('Collection');
+            Model = Collection.model('Model', {
+                attributes: ['x']
+            });
+            Model.map([{x: 2}, {x: 3}])
+                .then(function (instances) {
+                    console.log('instances', instances);
+                    var rq = Model.reactiveQuery();
+                    var Component = React.createClass({
+                        mixins: [SiestaMixin],
+                        render: function () {
+                            return (<span></span>);
+                        },
+                        componentDidMount: function () {
+                            this.listenAndSet(rq, 'models')
+                                .then(function () {
+                                    Model.map({x: 4}).then(function (instance) {
+                                        assert.equal(this.state.models.length, 3);
+                                        assert.include(this.state.models, instances[0]);
+                                        assert.include(this.state.models, instances[1]);
+                                        assert.include(this.state.models, instance);
+                                        done();
+                                    }.bind(this)).catch(done);
+                                }.bind(this)).catch(done)
+                        }
+                    });
+                    React.render(
+                        <Component />,
+                        document.getElementById('react')
+                    );
+                }).catch(done);
+
+        });
+
         it('arranged reactive query, initialised', function (done) {
             Collection = siesta.collection('Collection');
             Model = Collection.model('Model', {
@@ -305,7 +340,6 @@ describe('listen', function () {
                         componentDidMount: function () {
                             this.listenAndSet(rq, 'models')
                                 .then(function () {
-                                    console.log('state', this.state);
                                     assert.equal(this.state.models.length, 2);
                                     assert.include(this.state.models, instances[0]);
                                     assert.include(this.state.models, instances[1]);
@@ -320,6 +354,41 @@ describe('listen', function () {
                 }).catch(done);
 
         });
+        it('arranged reactive query, update', function (done) {
+            Collection = siesta.collection('Collection');
+            Model = Collection.model('Model', {
+                attributes: ['x']
+            });
+            Model.map([{x: 2}, {x: 3}])
+                .then(function (instances) {
+                    console.log('instances', instances);
+                    var rq = Model.arrangedReactiveQuery();
+                    var Component = React.createClass({
+                        mixins: [SiestaMixin],
+                        render: function () {
+                            return (<span></span>);
+                        },
+                        componentDidMount: function () {
+                            this.listenAndSet(rq, 'models')
+                                .then(function () {
+                                    Model.map({x: 4}).then(function (instance) {
+                                        assert.equal(this.state.models.length, 3);
+                                        assert.include(this.state.models, instances[0]);
+                                        assert.include(this.state.models, instances[1]);
+                                        assert.include(this.state.models, instance);
+                                        done();
+                                    }.bind(this)).catch(done);
+                                }.bind(this)).catch(done)
+                        }
+                    });
+                    React.render(
+                        <Component />,
+                        document.getElementById('react')
+                    );
+                }).catch(done);
+
+        });
+
     });
 
 

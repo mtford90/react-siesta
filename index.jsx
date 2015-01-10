@@ -92,7 +92,18 @@ var SiestaMixin = {
         // TODO: Wishy washy. Do instanceof check instead once ReactiveQuery is available on siesta object
         return typeof o.terminate == 'function';
     },
-    listenAndSet: function (o, prop, cb) {
+    listenAndSet: function (o) {
+        var opts, prop, cb;
+        if (typeof arguments[1] == 'object') {
+            opts = arguments[1];
+            prop = arguments[2];
+            cb = arguments[3];
+        }
+        else {
+            opts = {};
+            prop = arguments[1];
+            cb = arguments[2];
+        }
         var deferred = window.Q ? window.Q.defer() : FAKE_DEFERRED;
         cb = cb || function () {};
         var state = {};
@@ -123,6 +134,9 @@ var SiestaMixin = {
                     deferred.resolve(o.results);
                 }.bind(this));
             }
+        }
+        else {
+            throw new Error('Cannot listenAndSet objects of that type');
         }
         return deferred.promise;
     }
