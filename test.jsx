@@ -387,6 +387,67 @@ describe('listen', function () {
                 }).catch(done);
 
         });
+        it('singleton', function (done) {
+            Collection = siesta.collection('Collection');
+            Model = Collection.model('Model', {
+                attributes: ['x'],
+                singleton: true
+            });
+            siesta.install().then(function () {
+                var Component = React.createClass({
+                    mixins: [SiestaMixin],
+                    render: function () {
+                        return (<span></span>);
+                    },
+                    componentDidMount: function () {
+                        this.listenAndSet(Model, 'singleton')
+                            .then(function () {
+                                Model.one().then(function (singleton) {
+                                    assert.equal(this.state.singleton, singleton);
+                                    done();
+                                }.bind(this)).catch(done);
+                            }.bind(this)).catch(done);
+                    }
+                });
+                React.render(
+                    <Component />,
+                    document.getElementById('react')
+                );
+            }).catch(done);
+        });
+        it('singleton, update', function (done) {
+            Collection = siesta.collection('Collection');
+            Model = Collection.model('Model', {
+                attributes: ['x'],
+                singleton: true
+            });
+            siesta.install().then(function () {
+                var Component = React.createClass({
+                    mixins: [SiestaMixin],
+                    render: function () {
+                        return (<span></span>);
+                    },
+                    shouldComponentUpdate: function (nextProps, nextState) {
+                        if (nextState.singleton.x == '123') {
+                            done();
+                        }
+                    },
+                    componentDidMount: function () {
+                        this.listenAndSet(Model, 'singleton')
+                            .then(function () {
+                                Model.one().then(function (singleton) {
+                                    singleton.x = '123';
+                                    siesta.notify();
+                                }.bind(this)).catch(done);
+                            }.bind(this)).catch(done);
+                    }
+                });
+                React.render(
+                    <Component />,
+                    document.getElementById('react')
+                );
+            }).catch(done);
+        });
 
     });
 

@@ -135,6 +135,23 @@ var SiestaMixin = {
                 }.bind(this));
             }
         }
+        else if (o instanceof siesta._internal.Model) {
+            if (o.singleton) {
+                o.one().then(function (singleton) {
+                    var state = {};
+                    state[prop] = singleton;
+                    this.setState(state);
+                    cb(null, singleton);
+                    deferred.resolve(singleton);
+                }.bind(this));
+                this.listen(o, function () {
+                    this.setState();
+                }.bind(this));
+            }
+            else {
+                throw new Error('Can only listenAndSet singleton models');
+            }
+        }
         else {
             throw new Error('Cannot listenAndSet objects of that type');
         }
