@@ -15,20 +15,18 @@ var SiestaMixin = {
     componentWillUnmount: function () {
         this._cancelListeners();
     },
-    _listenToModel: function (func, Model, fn) {
+    _listenToModel: function (Model, fn) {
         var cancelListen;
         if (Model.singleton) {
             Model.one(function (err, singleton) {
                 if (!err) {
-                    cancelListen = this[func](singleton, function (n) {fn(singleton, n)});
+                    cancelListen = this.listen(singleton, function (n) {fn(n)});
                     this.listeners.push(cancelListen);
                 }
                 else fn(err);
             }.bind(this));
         }
-        else {
-            throw new Error('Cannot listen to a Model if it is not a singleton')
-        }
+        else throw new Error('Cannot listen to a Model if it is not a singleton');
         return function () {
             if (cancelListen) {
                 var idx = this.listeners.indexOf(cancelListen);
@@ -50,7 +48,7 @@ var SiestaMixin = {
     },
     listen: function (o, fn) {
         var cancelListen;
-        if (o instanceof siesta._internal.Model) cancelListen = this._listenToModel('listen', o, fn);
+        if (o instanceof siesta._internal.Model) cancelListen = this._listenToModel(o, fn);
         else cancelListen = o.listen(fn);
         if (cancelListen) this.listeners.push(cancelListen);
         return this.wrapCancelListen(cancelListen);
@@ -137,16 +135,53 @@ var SiestaMixin = {
         }
         else if (o instanceof siesta._internal.Model) {
             if (o.singleton) {
-                o.one().then(function (singleton) {
-                    var state = {};
-                    state[prop] = singleton;
-                    this.setState(state);
-                    cb(null, singleton);
-                    deferred.resolve(singleton);
-                }.bind(this));
-                this.listen(o, function () {
-                    this.setState();
-                }.bind(this));
+                var fields = opts.fields;
+                if (fields) {
+                    o.one(function (err, singleton) {
+                        if (!err) {
+                            var partialState = {};
+                            for (var i = 0; i < fields.length; i++) {
+                                var field = fields[i];
+                                partialState[field] = singleton[field];
+                            }
+                            this.setState(partialState);
+                            cb(null, singleton);
+                            deferred.resolve(singleton);
+                        }
+                        else {
+                            cb(err);
+                            deferred.reject(err);
+                        }
+                    }.bind(this));
+                    this.listen(o, function (e) {
+                        console.log('e', e);
+                        if (e.type == 'Set') {
+                            if (fields.indexOf(e.field) > -1) {
+                                var partialState = {};
+                                partialState[e.field] = e.new;
+                                this.setState(partialState)
+                            }
+                        }
+                    }.bind(this));
+                }
+                else {
+                    o.one(function (err, singleton) {
+                        if (!err) {
+                            var state = {};
+                            state[prop] = singleton;
+                            this.setState(state);
+                            cb(null, singleton);
+                            deferred.resolve(singleton);
+                        }
+                        else {
+                            cb(err);
+                            deferred.reject(err);
+                        }
+                    }.bind(this));
+                    this.listen(o, function () {
+                        this.setState();
+                    }.bind(this));
+                }
             }
             else {
                 throw new Error('Can only listenAndSet singleton models');
