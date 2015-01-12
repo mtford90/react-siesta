@@ -30,12 +30,12 @@ gulp.task('compile', ['build'], function () {
 });
 
 gulp.task('watch', ['build', 'build-test'], function () {
-    livereload.listen();
+    livereload.listen(40347);
     gulp.watch(['test.jsx'], ['build-test']);
     gulp.watch(['index.jsx'], ['build']);
     express()
         .use('/', express.static(__dirname))
         .use(express.static(__dirname))
-        .listen(3000);
-    open('http://localhost:3000/mocha.html');
+        .listen(4753);
+    open('http://localhost:4753/mocha.html');
 });

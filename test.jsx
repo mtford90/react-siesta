@@ -196,66 +196,70 @@ describe('listen', function () {
     });
 
     describe('listen and set', function () {
-        it('reactive query, initialised', function (done) {
-            Collection = siesta.collection('Collection');
-            Model = Collection.model('Model', {
-                attributes: ['x']
+        describe('reactive query', function () {
+            it('initialised', function (done) {
+                Collection = siesta.collection('Collection');
+                Model = Collection.model('Model', {
+                    attributes: ['x']
+                });
+                Model.map([{x: 2}, {x: 3}])
+                    .then(function (instances) {
+                        var rq = Model.reactiveQuery();
+                        rq.init().then(function () {
+                            var Component = React.createClass({
+                                mixins: [SiestaMixin],
+                                render: function () {
+                                    return (<span></span>);
+                                },
+                                componentDidMount: function () {
+                                    this.listenAndSet(rq, 'models');
+                                    assert.equal(this.state.models.length, 2);
+                                    assert.include(this.state.models, instances[0]);
+                                    assert.include(this.state.models, instances[1]);
+                                    done();
+                                }
+                            });
+                            React.render(
+                                <Component />,
+                                document.getElementById('react')
+                            );
+                        });
+                    }).catch(done);
+
             });
-            Model.map([{x: 2}, {x: 3}])
-                .then(function (instances) {
-                    var rq = Model.reactiveQuery();
-                    rq.init().then(function () {
+            it('not initialised', function (done) {
+                Collection = siesta.collection('Collection');
+                Model = Collection.model('Model', {
+                    attributes: ['x']
+                });
+                Model.map([{x: 2}, {x: 3}])
+                    .then(function (instances) {
+                        console.log('instances', instances);
+                        var rq = Model.reactiveQuery();
                         var Component = React.createClass({
                             mixins: [SiestaMixin],
                             render: function () {
                                 return (<span></span>);
                             },
                             componentDidMount: function () {
-                                this.listenAndSet(rq, 'models');
-                                assert.equal(this.state.models.length, 2);
-                                assert.include(this.state.models, instances[0]);
-                                assert.include(this.state.models, instances[1]);
-                                done();
+                                this.listenAndSet(rq, 'models')
+                                    .then(function () {
+                                        console.log('state', this.state);
+                                        assert.equal(this.state.models.length, 2);
+                                        assert.include(this.state.models, instances[0]);
+                                        assert.include(this.state.models, instances[1]);
+                                        done();
+                                    }.bind(this)).catch(done)
                             }
                         });
                         React.render(
                             <Component />,
                             document.getElementById('react')
                         );
-                    });
-                }).catch(done);
+                    }).catch(done);
 
-        });
-        it('reactive query, not initialised', function (done) {
-            Collection = siesta.collection('Collection');
-            Model = Collection.model('Model', {
-                attributes: ['x']
             });
-            Model.map([{x: 2}, {x: 3}])
-                .then(function (instances) {
-                    console.log('instances', instances);
-                    var rq = Model.reactiveQuery();
-                    var Component = React.createClass({
-                        mixins: [SiestaMixin],
-                        render: function () {
-                            return (<span></span>);
-                        },
-                        componentDidMount: function () {
-                            this.listenAndSet(rq, 'models')
-                                .then(function () {
-                                    console.log('state', this.state);
-                                    assert.equal(this.state.models.length, 2);
-                                    assert.include(this.state.models, instances[0]);
-                                    assert.include(this.state.models, instances[1]);
-                                    done();
-                                }.bind(this)).catch(done)
-                        }
-                    });
-                    React.render(
-                        <Component />,
-                        document.getElementById('react')
-                    );
-                }).catch(done);
+
 
         });
         it('reactive query, update', function (done) {
@@ -415,6 +419,7 @@ describe('listen', function () {
                 );
             }).catch(done);
         });
+
         it('singleton, update', function (done) {
             Collection = siesta.collection('Collection');
             Model = Collection.model('Model', {
