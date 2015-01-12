@@ -435,7 +435,7 @@ describe('react siesta', function () {
                     singleton: true
                 });
                 siesta.install().then(function () {
-                    var Component = React.createClass({
+                     var Component = React.createClass({
                         mixins: [SiestaMixin],
                         render: function () {
                             return (<span></span>);
@@ -461,7 +461,12 @@ describe('react siesta', function () {
                     );
                 }).catch(done);
             });
-            describe('fields', function () {
+
+
+        });
+
+        describe('fields', function () {
+            describe('singleton', function () {
                 it('init', function (done) {
                     Collection = siesta.collection('Collection');
                     Model = Collection.model('Model', {
@@ -533,7 +538,6 @@ describe('react siesta', function () {
                     }).catch(done);
                 });
             });
-
         });
     });
 
