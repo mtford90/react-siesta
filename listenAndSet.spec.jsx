@@ -399,11 +399,13 @@ describe('listen and set', function () {
                                 }
                             },
                             componentDidMount: function () {
-                                this.listenAndSet(Model, {fields: ['x']})
-                                    .then(function (singleton) {
-                                        singleton.x = '123';
-                                        siesta.notify();
-                                    }.bind(this)).catch(done);
+                                Model.one().then(function (model) {
+                                    this.listenAndSet(model, {fields: ['x']})
+                                        .then(function (singleton) {
+                                            singleton.x = '123';
+                                            siesta.notify();
+                                        }.bind(this)).catch(done);
+                                }.bind(this)).catch(done);
                             }
                         });
                         React.render(
