@@ -175,7 +175,7 @@ var SiestaMixin = {
         }.bind(this));
         callback(null, instance);
     },
-    listenAndSet: function (o) {
+    listenAndSetState: function (o) {
         var opts, prop, cb;
         if (typeof arguments[1] == 'object') {
             opts = arguments[1];
@@ -229,14 +229,14 @@ var SiestaMixin = {
                 }.bind(this));
             }
             else {
-                throw new Error('Can only listenAndSet singleton models');
+                throw new Error('Can only listenAndSetState singleton models');
             }
         }
         else if (o instanceof siesta._internal.siestaModel) {
             this._listenAndSetStateForModelInstance(o, opts, prop, done);
         }
         else {
-            throw new Error('Cannot listenAndSet objects of that type');
+            throw new Error('Cannot listenAndSetState objects of that type');
         }
         return deferred.promise;
     }

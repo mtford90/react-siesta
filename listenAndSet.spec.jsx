@@ -20,7 +20,7 @@ describe('listen and set', function () {
                             return (<span></span>);
                         },
                         componentDidMount: function () {
-                            this.listenAndSet(rq, 'models');
+                            this.listenAndSetState(rq, 'models');
                             assert.equal(this.state.models.length, 2);
                             assert.include(this.state.models, instances[0]);
                             assert.include(this.state.models, instances[1]);
@@ -50,7 +50,7 @@ describe('listen and set', function () {
                         return (<span></span>);
                     },
                     componentDidMount: function () {
-                        this.listenAndSet(rq, 'models')
+                        this.listenAndSetState(rq, 'models')
                             .then(function () {
                                 console.log('state', this.state);
                                 assert.equal(this.state.models.length, 2);
@@ -82,7 +82,7 @@ describe('listen and set', function () {
                         return (<span></span>);
                     },
                     componentDidMount: function () {
-                        this.listenAndSet(rq, 'models')
+                        this.listenAndSetState(rq, 'models')
                             .then(function () {
                                 Model.map({x: 4}).then(function (instance) {
                                     assert.equal(this.state.models.length, 3);
@@ -118,7 +118,7 @@ describe('listen and set', function () {
                                 return (<span></span>);
                             },
                             componentDidMount: function () {
-                                this.listenAndSet(rq, 'models');
+                                this.listenAndSetState(rq, 'models');
                                 assert.equal(this.state.models.length, 2);
                                 assert.include(this.state.models, instances[0]);
                                 assert.include(this.state.models, instances[1]);
@@ -148,7 +148,7 @@ describe('listen and set', function () {
                             return (<span></span>);
                         },
                         componentDidMount: function () {
-                            this.listenAndSet(rq, 'models')
+                            this.listenAndSetState(rq, 'models')
                                 .then(function () {
                                     assert.equal(this.state.models.length, 2);
                                     assert.include(this.state.models, instances[0]);
@@ -179,7 +179,7 @@ describe('listen and set', function () {
                             return (<span></span>);
                         },
                         componentDidMount: function () {
-                            this.listenAndSet(rq, 'models')
+                            this.listenAndSetState(rq, 'models')
                                 .then(function () {
                                     Model.map({x: 4}).then(function (instance) {
                                         assert.equal(this.state.models.length, 3);
@@ -214,7 +214,7 @@ describe('listen and set', function () {
                         return (<span></span>);
                     },
                     componentDidMount: function () {
-                        this.listenAndSet(Model, 'singleton')
+                        this.listenAndSetState(Model, 'singleton')
                             .then(function () {
                                 Model.one().then(function (singleton) {
                                     assert.equal(this.state.singleton, singleton);
@@ -247,7 +247,7 @@ describe('listen and set', function () {
                         }
                     },
                     componentDidMount: function () {
-                        this.listenAndSet(Model, 'singleton')
+                        this.listenAndSetState(Model, 'singleton')
                             .then(function () {
                                 Model.one().then(function (singleton) {
                                     singleton.x = '123';
@@ -287,7 +287,7 @@ describe('listen and set', function () {
                                 return (<span></span>);
                             },
                             componentDidMount: function () {
-                                this.listenAndSet(Model, {fields: ['x']})
+                                this.listenAndSetState(Model, {fields: ['x']})
                                     .then(function () {
                                         assert.equal(this.state.x, 1);
                                         assert.notOk(this.state.y);
@@ -325,7 +325,7 @@ describe('listen and set', function () {
                                 }
                             },
                             componentDidMount: function () {
-                                this.listenAndSet(Model, {fields: ['x']})
+                                this.listenAndSetState(Model, {fields: ['x']})
                                     .then(function (singleton) {
                                         console.log(1, singleton);
                                         assert.equal(this.state.x, 1);
@@ -362,7 +362,7 @@ describe('listen and set', function () {
                             },
                             componentDidMount: function () {
                                 Model.one().then(function (model) {
-                                    this.listenAndSet(model, {fields: ['x']})
+                                    this.listenAndSetState(model, {fields: ['x']})
                                         .then(function () {
                                             assert.equal(this.state.x, 1);
                                             assert.notOk(this.state.y);
@@ -402,7 +402,7 @@ describe('listen and set', function () {
                             },
                             componentDidMount: function () {
                                 Model.one().then(function (model) {
-                                    this.listenAndSet(model, {fields: ['x']})
+                                    this.listenAndSetState(model, {fields: ['x']})
                                         .then(function (singleton) {
                                             singleton.x = '123';
                                             siesta.notify();
@@ -439,7 +439,7 @@ describe('listen and set', function () {
                                 return (<span></span>);
                             },
                             componentDidMount: function () {
-                                this.listenAndSet(Model, {fields: {x: 'custom'}})
+                                this.listenAndSetState(Model, {fields: {x: 'custom'}})
                                     .then(function () {
                                         assert.equal(this.state.custom, 1);
                                         assert.notOk(this.state.y);
@@ -477,7 +477,7 @@ describe('listen and set', function () {
                                 }
                             },
                             componentDidMount: function () {
-                                this.listenAndSet(Model, {fields: {x: 'custom'}})
+                                this.listenAndSetState(Model, {fields: {x: 'custom'}})
                                     .then(function (singleton) {
                                         singleton.x = '123';
                                         siesta.notify();
@@ -512,7 +512,7 @@ describe('listen and set', function () {
                             },
                             componentDidMount: function () {
                                 Model.one().then(function (model) {
-                                    this.listenAndSet(model, {fields: {x: 'custom'}})
+                                    this.listenAndSetState(model, {fields: {x: 'custom'}})
                                         .then(function () {
                                             assert.equal(this.state.custom, 1);
                                             assert.notOk(this.state.y);
@@ -552,7 +552,7 @@ describe('listen and set', function () {
                             },
                             componentDidMount: function () {
                                 Model.one().then(function (model) {
-                                    this.listenAndSet(model, {fields: {x: 'custom'}})
+                                    this.listenAndSetState(model, {fields: {x: 'custom'}})
                                         .then(function (singleton) {
                                             singleton.x = '123';
                                             siesta.notify();
@@ -596,7 +596,7 @@ describe('listen and set', function () {
                                 return (<span></span>);
                             },
                             componentDidMount: function () {
-                                this.listenAndSet(Model, {fields: [{x: 'custom_x'}, {y: 'custom_y'}, 'z']})
+                                this.listenAndSetState(Model, {fields: [{x: 'custom_x'}, {y: 'custom_y'}, 'z']})
                                     .then(function () {
                                         assert.equal(this.state.custom_x, 1);
                                         assert.equal(this.state.custom_y, 2);
@@ -635,7 +635,7 @@ describe('listen and set', function () {
                                 }
                             },
                             componentDidMount: function () {
-                                this.listenAndSet(Model, {fields: {x: 'custom'}})
+                                this.listenAndSetState(Model, {fields: {x: 'custom'}})
                                     .then(function (singleton) {
                                         singleton.x = '123';
                                         siesta.notify();
@@ -670,7 +670,7 @@ describe('listen and set', function () {
                             },
                             componentDidMount: function () {
                                 Model.one().then(function (model) {
-                                    this.listenAndSet(model, {fields: {x: 'custom'}})
+                                    this.listenAndSetState(model, {fields: {x: 'custom'}})
                                         .then(function () {
                                             assert.equal(this.state.custom, 1);
                                             assert.notOk(this.state.y);
@@ -710,7 +710,7 @@ describe('listen and set', function () {
                             },
                             componentDidMount: function () {
                                 Model.one().then(function (model) {
-                                    this.listenAndSet(model, {fields: {x: 'custom'}})
+                                    this.listenAndSetState(model, {fields: {x: 'custom'}})
                                         .then(function (singleton) {
                                             singleton.x = '123';
                                             siesta.notify();

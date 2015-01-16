@@ -27,7 +27,7 @@ describe('nested mixins', function () {
                     }
                 },
                 componentDidMount: function () {
-                    this.listenAndSet(Model, 'singleton')
+                    this.listenAndSetState(Model, 'singleton')
                         .then(function () {
                             Model.one().then(function (singleton) {
                                 singleton.x = '123';
