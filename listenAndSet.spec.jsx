@@ -265,78 +265,153 @@ describe('listen and set', function () {
 
 
     });
-
     describe('fields', function () {
-        describe('singleton', function () {
-            it('init', function (done) {
-                Collection = siesta.collection('Collection');
-                Model = Collection.model('Model', {
-                    attributes: [{
-                        name: 'x',
-                        default: 1
-                    }, {
-                        name: 'y',
-                        default: 2
-                    }],
-                    singleton: true
-                });
-                siesta.install().then(function () {
-                    var Component = React.createClass({
-                        mixins: [SiestaMixin],
-                        render: function () {
-                            return (<span></span>);
-                        },
-                        componentDidMount: function () {
-                            this.listenAndSet(Model, {fields: ['x']}, 'singleton')
-                                .then(function () {
-                                    assert.equal(this.state.x, 1);
-                                    assert.notOk(this.state.y);
-                                    done();
-                                }.bind(this)).catch(done);
-                        }
+        describe('array', function () {
+            describe('singleton', function () {
+                it('init', function (done) {
+                    Collection = siesta.collection('Collection');
+                    Model = Collection.model('Model', {
+                        attributes: [{
+                            name: 'x',
+                            default: 1
+                        }, {
+                            name: 'y',
+                            default: 2
+                        }],
+                        singleton: true
                     });
-                    React.render(
-                        <Component />,
-                        document.getElementById('react')
-                    );
-                }).catch(done);
-            });
-            it('update', function (done) {
-                Collection = siesta.collection('Collection');
-                Model = Collection.model('Model', {
-                    attributes: [{
-                        name: 'x',
-                        default: 1
-                    }, {
-                        name: 'y',
-                        default: 2
-                    }],
-                    singleton: true
-                });
-                siesta.install().then(function () {
-                    var Component = React.createClass({
-                        mixins: [SiestaMixin],
-                        render: function () {
-                            return (<span></span>);
-                        },
-                        shouldComponentUpdate: function (nextProps, nextState) {
-                            if (nextState.x == '123') {
-                                done();
+                    siesta.install().then(function () {
+                        var Component = React.createClass({
+                            mixins: [SiestaMixin],
+                            render: function () {
+                                return (<span></span>);
+                            },
+                            componentDidMount: function () {
+                                this.listenAndSet(Model, {fields: ['x']})
+                                    .then(function () {
+                                        assert.equal(this.state.x, 1);
+                                        assert.notOk(this.state.y);
+                                        done();
+                                    }.bind(this)).catch(done);
                             }
-                        },
-                        componentDidMount: function () {
-                            this.listenAndSet(Model, {fields: ['x']}, 'singleton')
-                                .then(function (singleton) {
-                                    singleton.x = '123';
-                                    siesta.notify();
-                                }.bind(this)).catch(done);
-                        }
+                        });
+                        React.render(
+                            <Component />,
+                            document.getElementById('react')
+                        );
+                    }).catch(done);
+                });
+                it('update', function (done) {
+                    Collection = siesta.collection('Collection');
+                    Model = Collection.model('Model', {
+                        attributes: [{
+                            name: 'x',
+                            default: 1
+                        }, {
+                            name: 'y',
+                            default: 2
+                        }],
+                        singleton: true
                     });
-                    React.render(
-                        <Component />,
-                        document.getElementById('react')
-                    );
-                }).catch(done);
+                    siesta.install().then(function () {
+                        var Component = React.createClass({
+                            mixins: [SiestaMixin],
+                            render: function () {
+                                return (<span></span>);
+                            },
+                            shouldComponentUpdate: function (nextProps, nextState) {
+                                if (nextState.x == '123') {
+                                    done();
+                                }
+                            },
+                            componentDidMount: function () {
+                                this.listenAndSet(Model, {fields: ['x']})
+                                    .then(function (singleton) {
+                                        singleton.x = '123';
+                                        siesta.notify();
+                                    }.bind(this)).catch(done);
+                            }
+                        });
+                        React.render(
+                            <Component />,
+                            document.getElementById('react')
+                        );
+                    }).catch(done);
+                });
+            });
+            describe('model', function () {
+                it('init', function (done) {
+                    Collection = siesta.collection('Collection');
+                    Model = Collection.model('Model', {
+                        attributes: [{
+                            name: 'x',
+                            default: 1
+                        }, {
+                            name: 'y',
+                            default: 2
+                        }],
+                        singleton: true
+                    });
+                    siesta.install().then(function () {
+                        var Component = React.createClass({
+                            mixins: [SiestaMixin],
+                            render: function () {
+                                return (<span></span>);
+                            },
+                            componentDidMount: function () {
+                                Model.one().then(function (model) {
+                                    this.listenAndSet(model, {fields: ['x']})
+                                        .then(function () {
+                                            assert.equal(this.state.x, 1);
+                                            assert.notOk(this.state.y);
+                                            done();
+                                        }.bind(this)).catch(done);
+                                }.bind(this)).catch(done);
+                            }
+                        });
+                        React.render(
+                            <Component />,
+                            document.getElementById('react')
+                        );
+                    }).catch(done);
+                });
+                it('update', function (done) {
+                    Collection = siesta.collection('Collection');
+                    Model = Collection.model('Model', {
+                        attributes: [{
+                            name: 'x',
+                            default: 1
+                        }, {
+                            name: 'y',
+                            default: 2
+                        }],
+                        singleton: true
+                    });
+                    siesta.install().then(function () {
+                        var Component = React.createClass({
+                            mixins: [SiestaMixin],
+                            render: function () {
+                                return (<span></span>);
+                            },
+                            shouldComponentUpdate: function (nextProps, nextState) {
+                                if (nextState.x == '123') {
+                                    done();
+                                }
+                            },
+                            componentDidMount: function () {
+                                this.listenAndSet(Model, {fields: ['x']})
+                                    .then(function (singleton) {
+                                        singleton.x = '123';
+                                        siesta.notify();
+                                    }.bind(this)).catch(done);
+                            }
+                        });
+                        React.render(
+                            <Component />,
+                            document.getElementById('react')
+                        );
+                    }).catch(done);
+                });
             });
         });
     });

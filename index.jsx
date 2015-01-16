@@ -95,8 +95,7 @@ var SiestaMixin = {
         var opts, prop, cb;
         if (typeof arguments[1] == 'object') {
             opts = arguments[1];
-            prop = arguments[2];
-            cb = arguments[3];
+            cb = arguments[2];
         }
         else {
             opts = {};
@@ -107,7 +106,7 @@ var SiestaMixin = {
         cb = cb || function () {};
         var state = {};
 
-        function updateWithResults() {
+        var updateWithResults = function() {
             state[prop] = o.results;
             this.setState(state, function () {
                 this.listen(o, function () {
@@ -118,7 +117,7 @@ var SiestaMixin = {
                     }
                 }.bind(this));
             });
-        }
+        }.bind(this);
 
         if (this.isReactiveQuery(o)) {
             if (o.initialised) {
@@ -138,16 +137,16 @@ var SiestaMixin = {
             if (o.singleton) {
                 var fields = opts.fields;
                 if (fields) {
-                    o.one(function (err, singleton) {
+                    o.one(function (err, model) {
                         if (!err) {
                             var partialState = {};
                             for (var i = 0; i < fields.length; i++) {
                                 var field = fields[i];
-                                partialState[field] = singleton[field];
+                                partialState[field] = model[field];
                             }
                             this.setState(partialState);
-                            cb(null, singleton);
-                            deferred.resolve(singleton);
+                            cb(null, model);
+                            deferred.resolve(model);
                         }
                         else {
                             cb(err);
@@ -188,6 +187,26 @@ var SiestaMixin = {
             else {
                 throw new Error('Can only listenAndSet singleton models');
             }
+        }
+        else if (o instanceof siesta._internal.siestaModel) {
+            state = {};
+            if (opts.fields) {
+                opts.fields.forEach(function (f) {
+                    state[f] = o[f];
+                });
+            }
+            else {
+                state[prop] = o;
+            }
+            this.setState(state);
+            this.listen(o, function (e) {
+                if (opts.fields.indexOf(e.field) > -1) {
+                    var state = {};
+                    state[e.field] = e.new;
+                    this.setState(state);
+                }
+            }.bind(this));
+            deferred.resolve(o);
         }
         else {
             throw new Error('Cannot listenAndSet objects of that type');
