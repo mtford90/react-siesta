@@ -5,6 +5,30 @@ var isArray = Array.isArray || function (obj) {
         return _.toString.call(obj) === '[object Array]';
     };
 
+var isString = function (str) {
+    return typeof str == 'string' || str instanceof String;
+};
+
+/**
+ * Wrap a callback and a deferred in a convienience function.
+ * @param [cb]
+ * @param deferred
+ * @returns {Function}
+ * @private
+ */
+function _done(cb, deferred) {
+    return function (err, o) {
+        if (err) {
+            if (cb) cb(err);
+            deferred.reject(err);
+        }
+        else {
+            if (cb) cb();
+            deferred.resolve(o);
+        }
+    };
+}
+
 var SiestaMixin = {
     componentWillMount: function () {
         this.listeners = [];
@@ -61,19 +85,18 @@ var SiestaMixin = {
     query: function (model, query, prop, cb) {
         var deferred = window.Q ? window.Q.defer() : FAKE_DEFERRED;
         cb = cb || function () {};
+        var done = _done(cb, deferred);
         model.query(query, function (err, res) {
-            console.log('done');
+            console.log('_done');
             if (!err) {
                 var state = {};
                 state[prop] = res;
                 this.setState(state, function () {
-                    cb(null, res);
-                    deferred.resolve(res);
+                    done(null, res);
                 });
             }
             else {
-                cb(err);
-                deferred.reject(err);
+                done(err);
             }
         }.bind(this));
         return deferred.promise;
@@ -100,25 +123,36 @@ var SiestaMixin = {
         opts = opts || {};
         if (!opts.fields && !prop) throw Error('Must either specify fields or prop');
         if (opts.fields) {
+            var fields;
             if (isArray(opts.fields)) {
+                fields = {};
                 opts.fields.forEach(function (f) {
-                    state[f] = instance[f];
+                    if (isString(f)) {
+                        fields[f] = f;
+                    }
+                    else {
+                        for (var prop in f) {
+                            if (f.hasOwnProperty(prop)) fields[prop] = f[prop];
+                        }
+                    }
+                    //state[f] = instance[f];
                 });
             }
             else {
-                Object.keys(opts.fields).forEach(function (f) {
-                    var custom = opts.fields[f];
-                    state[custom] = instance[f];
-                });
+                fields = opts.fields;
             }
+            console.log('fields', fields);
+            Object.keys(fields).forEach(function (f) {
+                var custom = fields[f];
+                state[custom] = instance[f];
+            });
         }
         else {
             state[prop] = instance;
         }
+        console.log('state', state);
         this.setState(state);
-        console.log('listening...', instance);
         this.listen(instance, function (e) {
-            console.log('listened!', e);
             if (opts.fields) {
                 var custom = e.field,
                     doesContain;
@@ -154,6 +188,7 @@ var SiestaMixin = {
         }
         var deferred = window.Q ? window.Q.defer() : FAKE_DEFERRED;
         cb = cb || function () {};
+        var done = _done(cb, deferred);
         var state = {};
 
         var updateWithResults = function () {
@@ -172,14 +207,12 @@ var SiestaMixin = {
         if (this.isReactiveQuery(o)) {
             if (o.initialised) {
                 updateWithResults.call(this);
-                cb(null, o.results);
-                deferred.resolve(o.results);
+                done(null, o.results);
             }
             else {
                 o.init(function () {
                     updateWithResults.call(this);
-                    cb(null, o.results);
-                    deferred.resolve(o.results);
+                    done(null, o.results);
                 }.bind(this));
             }
         }
@@ -191,16 +224,7 @@ var SiestaMixin = {
                         deferred.reject(err);
                     }
                     else {
-                        this._listenAndSetStateForModelInstance(instance, opts, prop, function (err) {
-                            if (err) {
-                                cb(err);
-                                deferred.reject(err);
-                            }
-                            else {
-                                cb();
-                                deferred.resolve(instance);
-                            }
-                        });
+                        this._listenAndSetStateForModelInstance(instance, opts, prop, done);
                     }
                 }.bind(this));
             }
@@ -209,16 +233,7 @@ var SiestaMixin = {
             }
         }
         else if (o instanceof siesta._internal.siestaModel) {
-            this._listenAndSetStateForModelInstance(o, opts, prop, function (err) {
-                if (err) {
-                    cb(err);
-                    deferred.reject(err);
-                }
-                else {
-                    cb();
-                    deferred.resolve(o);
-                }
-            });
+            this._listenAndSetStateForModelInstance(o, opts, prop, done);
         }
         else {
             throw new Error('Cannot listenAndSet objects of that type');
