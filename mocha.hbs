@@ -1,0 +1,34 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Mocha Tests</title>
+    <link rel="stylesheet" href="../node_modules/mocha/mocha.css"/>
+    <script src="../node_modules/es5-shim/es5-shim.js"></script>
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script src="../node_modules/underscore/underscore.js"></script>
+    <script src="../node_modules/q/q.js"></script>
+    <script src="../node_modules/pouchdb/dist/pouchdb.js"></script>
+    <script src="../node_modules/siesta-orm/dist/siesta.js"></script>
+    <script src="../node_modules/react/dist/react.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
+</head>
+<body>
+<div id="mocha"></div>
+<script src="../node_modules/mocha/mocha.js"></script>
+<script>
+        mocha.setup('bdd');
+</script>
+{{#each specs}}
+    <script src="{{this}}"></script>
+{{/each}}
+<script src="react-siesta.js"></script>
+<script>
+    var runner = mocha.run();
+</script>
+<!--suppress JSUnresolvedLibraryURL -->
+<script src="http://localhost:40347/livereload.js"></script>
+<div id="react">
+    <!-- React can render here -->
+</div>
+</body>
+</html>

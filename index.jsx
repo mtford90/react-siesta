@@ -19,6 +19,7 @@ var SiestaMixin = {
         var cancelListen;
         if (Model.singleton) {
             Model.one(function (err, singleton) {
+                console.log('singleton', singleton);
                 if (!err) {
                     cancelListen = this.listen(singleton, function (n) {fn(n)});
                     this.listeners.push(cancelListen);
@@ -153,8 +154,9 @@ var SiestaMixin = {
                             deferred.reject(err);
                         }
                     }.bind(this));
+                    console.log('listening...', o);
                     this.listen(o, function (e) {
-                        console.log('e', e);
+                        console.log('listenAndSet', e);
                         if (e.type == 'Set') {
                             if (fields.indexOf(e.field) > -1) {
                                 var partialState = {};
