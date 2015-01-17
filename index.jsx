@@ -43,26 +43,21 @@ var SiestaMixin = {
     componentWillUnmount: function () {
         this._cancelListeners();
     },
-    _listenToModel: function (Model, fn) {
-        var cancelListen;
+    _listenToModel: function (field, Model, handler, cb) {
         if (Model.singleton) {
-            Model.one(function (err, singleton) {
-                console.log('singleton', singleton);
+            Model.one(function (err, instance) {
+                console.log('singleton', instance);
                 if (!err) {
-                    cancelListen = this.listen(singleton, function (n) {fn(n)});
-                    this.listeners.push(cancelListen);
+                    if (field) this.listen(field, instance, function (n) {handler(n)});
+                    else this.listen(instance, function (n) {handler(n)});
+                    cb(err, instance);
                 }
-                else fn(err);
+                else {
+                    handler(err);
+                }
             }.bind(this));
         }
         else throw new Error('Cannot listen to a Model if it is not a singleton');
-        return function () {
-            if (cancelListen) {
-                var idx = this.listeners.indexOf(cancelListen);
-                this.listeners.splice(idx, 1);
-                cancelListen();
-            }
-        }.bind(this);
     },
     wrapCancelListen: function (cancelListen) {
         var wrappedCancelListen;
@@ -75,17 +70,38 @@ var SiestaMixin = {
         }
         return wrappedCancelListen;
     },
-    listen: function (o, fn) {
-        var cancelListen;
-        if (o instanceof siesta._internal.Model) cancelListen = this._listenToModel(o, fn);
-        else cancelListen = o.listen(fn);
-        if (cancelListen) this.listeners.push(cancelListen);
-        return this.wrapCancelListen(cancelListen);
+    listen: function () {
+        var field, listenee, handler, cb;
+        if (isString(arguments[0])) {
+            field = arguments[0];
+            listenee = arguments[1];
+            handler = arguments[2];
+            cb = arguments[3];
+        }
+        else {
+            listenee = arguments[0];
+            handler = arguments[1];
+            cb = arguments[2];
+        }
+        cb = cb || function () {};
+        var deferred = window.Q ? window.Q.defer() : FAKE_DEFERRED,
+            done = _done(cb, deferred);
+        if (listenee instanceof siesta._internal.Model) {
+            this._listenToModel(field, listenee, handler, done);
+        }
+        else {
+            var cancelListen;
+            if (field) cancelListen = listenee.listen(field, handler);
+            else cancelListen = listenee.listen(handler);
+            this.listeners.push(cancelListen);
+            done(null, listenee);
+        }
+        return deferred.promise;
     },
     query: function (model, query, prop, cb) {
-        var deferred = window.Q ? window.Q.defer() : FAKE_DEFERRED;
         cb = cb || function () {};
-        var done = _done(cb, deferred);
+        var deferred = window.Q ? window.Q.defer() : FAKE_DEFERRED,
+            done = _done(cb, deferred);
         model.query(query, function (err, res) {
             console.log('_done');
             if (!err) {

@@ -7,69 +7,145 @@ describe('listen', function () {
     beforeEach(function (done) {
         siesta.reset(done);
     });
-    it('instance', function (done) {
-        Collection = siesta.collection('Collection');
-        Model = Collection.model('Model', {
-            attributes: ['x']
+
+    describe('instance', function () {
+        it('all event types', function (done) {
+            Collection = siesta.collection('Collection');
+            Model = Collection.model('Model', {
+                attributes: ['x']
+            });
+            Model.map({x: 1}).then(function (m) {
+                var instance = m;
+                var Component = React.createClass({
+                    mixins: [SiestaMixin],
+                    render: function () {
+                        return (<span></span>);
+                    },
+                    componentDidMount: function () {
+                        this.listen(instance, function () {})
+                            .then(function () {
+                                var numListeners = this.listeners.length;
+                                assert(numListeners == 1, 'Should now be 1 listener but there are ' + numListeners + ' instead');
+                                done();
+                            }.bind(this))
+                    }
+                });
+                React.render(
+                    <Component />,
+                    document.getElementById('react')
+                );
+                instance.x = 2;
+            }).catch(done);
         });
-        Model.map({x: 1}).then(function (m) {
-            var instance = m;
+        it('specific event type', function (done) {
+            Collection = siesta.collection('Collection');
+            Model = Collection.model('Model', {
+                attributes: ['x'],
+                methods: {
+                    foo: function () {
+                        this.emit('foo', {});
+                    },
+                    bar: function () {
+                        this.emit('bar', {});
+                    }
+                }
+            });
+            Model.map({x: 1}).then(function (m) {
+                var instance = m;
+                var Component = React.createClass({
+                    mixins: [SiestaMixin],
+                    render: function () {
+                        return (<span></span>);
+                    },
+                    componentDidMount: function () {
+                        this.listen('foo', instance, function (e) {
+                            assert.equal(e.type, 'foo');
+                            done();
+                        });
+                        m.bar();
+                        m.foo();
+                    }
+                });
+                React.render(
+                    <Component />,
+                    document.getElementById('react')
+                );
+                instance.x = 2;
+            }).catch(done);
+        });
+    });
+
+    describe('singleton', function () {
+        it('all event types', function (done) {
+            Collection = siesta.collection('Collection');
+            Model = Collection.model('Model', {
+                attributes: ['x'],
+                singleton: true
+            });
             var Component = React.createClass({
                 mixins: [SiestaMixin],
                 render: function () {
                     return (<span></span>);
                 },
                 componentDidMount: function () {
-                    var cancelListen;
-                    cancelListen = this.listen(instance, function (n) {
-                        cancelListen();
-                        var numListeners = this.listeners.length;
-                        assert(numListeners == 0, 'Should now be 0 listeners but there are ' + numListeners + ' instead');
-                        done();
-                    }.bind(this));
-                    var numListeners = this.listeners.length;
-                    assert(numListeners == 1, 'Should now be 1 listener but there are ' + numListeners + ' instead');
+                    this.listen(Model, function () {})
+                        .then(function (inst) {
+                            var numListeners = this.listeners.length;
+                            assert(numListeners == 1, 'Should now be 1 listener but there are ' + numListeners + ' instead');
+                            assert.ok(inst);
+                            done();
+                        }.bind(this))
+                        .catch(done);
                 }
             });
             React.render(
                 <Component />,
                 document.getElementById('react')
             );
-            instance.x = 2;
-        }).catch(done);
+            Model.one().then(function (instance) {
+                instance.x = 2;
+            })
+        });
+        it('specific event types', function (done) {
+            Collection = siesta.collection('Collection');
+            Model = Collection.model('Model', {
+                attributes: ['x'],
+                singleton: true,
+                methods: {
+                    foo: function () {
+                        this.emit('foo', {});
+                    },
+                    bar: function () {
+                        this.emit('bar', {});
+                    }
+                }
+            });
+            var Component = React.createClass({
+                mixins: [SiestaMixin],
+                render: function () {
+                    return (<span></span>);
+                },
+                componentDidMount: function () {
+                    this.listen('foo', Model, function (e) {
+                        assert.equal(e.type, 'foo');
+                        done();
+                    }).catch(done);
+                    Model.one().then(function(m) {
+                        m.bar();
+                        m.foo();
+                    }).catch(done);
+                }
+            });
+            React.render(
+                <Component />,
+                document.getElementById('react')
+            );
+            Model.one().then(function (instance) {
+                instance.x = 2;
+            })
+        });
     });
 
-    it('singleton', function (done) {
-        Collection = siesta.collection('Collection');
-        Model = Collection.model('Model', {
-            attributes: ['x'],
-            singleton: true
-        });
-        var Component = React.createClass({
-            mixins: [SiestaMixin],
-            render: function () {
-                return (<span></span>);
-            },
-            componentDidMount: function () {
-                var cancelListen;
-                cancelListen = this.listen(Model, function (n) {
-                    cancelListen();
-                    var numListeners = this.listeners.length;
-                    assert(numListeners == 0, 'Should now be 0 listeners but there are ' + numListeners + ' instead');
-                    done();
-                }.bind(this));
-                var numListeners = this.listeners.length;
-                assert(numListeners == 1, 'Should now be 1 listener but there are ' + numListeners + ' instead');
-            }
-        });
-        React.render(
-            <Component />,
-            document.getElementById('react')
-        );
-        Model.one().then(function (instance) {
-            instance.x = 2;
-        })
-    });
 
     it('reactive query', function (done) {
         Collection = siesta.collection('Collection');
@@ -84,15 +160,13 @@ describe('listen', function () {
                     return (<span></span>);
                 },
                 componentDidMount: function () {
-                    var cancelListen;
-                    cancelListen = this.listen(rq, function () {
-                        cancelListen();
-                        var numListeners = this.listeners.length;
-                        assert(numListeners == 0, 'Should now be 0 listeners but there are ' + numListeners + ' instead');
-                        done();
-                    }.bind(this));
-                    var numListeners = this.listeners.length;
-                    assert(numListeners == 1, 'Should now be 1 listener but there are ' + numListeners + ' instead');
+                    this.listen(rq, function () {})
+                        .then(function (_rq) {
+                            var numListeners = this.listeners.length;
+                            assert.equal(rq, _rq);
+                            assert(numListeners == 1, 'Should now be 1 listener but there are ' + numListeners + ' instead');
+                            done();
+                        }.bind(this)).catch(done);
                 }
             });
             React.render(
@@ -116,15 +190,12 @@ describe('listen', function () {
                     return (<span></span>);
                 },
                 componentDidMount: function () {
-                    var cancelListen;
-                    cancelListen = this.listen(rq, function () {
-                        cancelListen();
-                        var numListeners = this.listeners.length;
-                        assert(numListeners == 0, 'Should now be 0 listeners but there are ' + numListeners + ' instead');
-                        done();
-                    }.bind(this));
-                    var numListeners = this.listeners.length;
-                    assert(numListeners == 1, 'Should now be 1 listener but there are ' + numListeners + ' instead');
+                    this.listen(rq, function () {})
+                        .then(function () {
+                            var numListeners = this.listeners.length;
+                            assert(numListeners == 1, 'Should now be 1 listener but there are ' + numListeners + ' instead');
+                            done();
+                        }.bind(this)).catch(done);
                 }
             });
             React.render(
