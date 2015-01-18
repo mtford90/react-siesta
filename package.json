@@ -50,13 +50,12 @@
     "q": "^1.1.2",
     "react": "^0.12.2",
     "serve-static": "^1.8.0",
-    "siesta-orm": "^0.1.2",
     "uglify-js": "^2.4.16",
     "uglifyjs": "^2.3.6",
     "underscore": "^1.7.0"
   },
   "dependencies": {
     "siesta": "^0.2.9",
-    "siesta-orm": "^0.1.4"
+    "siesta-orm": "^0.1.8"
   }
 }
