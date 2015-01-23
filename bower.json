@@ -21,10 +21,7 @@
     "reactjs",
     "siesta"
   ],
-  "dependencies": {
-    "siesta": "~0.1.0"
-  },
   "devDependencies": {
-    "siesta": "~0.1.0"
+    "siesta": "~0.1"
   }
 }
