@@ -1,6 +1,6 @@
 {
   "name": "react-siesta",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "React mixins & support for Siesta",
   "main": "index.jsx",
   "scripts": {
