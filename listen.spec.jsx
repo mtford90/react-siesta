@@ -22,12 +22,12 @@ describe('listen', function () {
                         return (<span></span>);
                     },
                     componentDidMount: function () {
-                        this.listen(instance, function () {})
-                            .then(function () {
-                                var numListeners = this.listeners.length;
-                                assert(numListeners == 1, 'Should now be 1 listener but there are ' + numListeners + ' instead');
-                                done();
-                            }.bind(this))
+                        this.listen(instance, function (event) {
+                            assert.ok(event, 'should be an evemt');
+                            var numListeners = this.listeners.length;
+                            assert(numListeners == 1, 'Should now be 1 listener but there are ' + numListeners + ' instead');
+                            done();
+                        }.bind(this));
                     }
                 });
                 React.render(
@@ -88,7 +88,8 @@ describe('listen', function () {
                     return (<span></span>);
                 },
                 componentDidMount: function () {
-                    this.listen(Model, function () {})
+                    this.listen(Model, function () {
+                    })
                         .then(function (inst) {
                             var numListeners = this.listeners.length;
                             assert(numListeners == 1, 'Should now be 1 listener but there are ' + numListeners + ' instead');
@@ -130,7 +131,7 @@ describe('listen', function () {
                         assert.equal(e.type, 'foo');
                         done();
                     }).catch(done);
-                    Model.one().then(function(m) {
+                    Model.one().then(function (m) {
                         m.bar();
                         m.foo();
                     }).catch(done);
@@ -160,7 +161,8 @@ describe('listen', function () {
                     return (<span></span>);
                 },
                 componentDidMount: function () {
-                    this.listen(rq, function () {})
+                    this.listen(rq, function () {
+                    })
                         .then(function (_rq) {
                             var numListeners = this.listeners.length;
                             assert.equal(rq, _rq);
@@ -190,7 +192,8 @@ describe('listen', function () {
                     return (<span></span>);
                 },
                 componentDidMount: function () {
-                    this.listen(rq, function () {})
+                    this.listen(rq, function () {
+                    })
                         .then(function () {
                             var numListeners = this.listeners.length;
                             assert(numListeners == 1, 'Should now be 1 listener but there are ' + numListeners + ' instead');
